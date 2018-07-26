@@ -14,7 +14,7 @@
             <img v-lazy="attachImageUrl(data.editors[0].avatar)" alt="">
         </div>
         <ul class="list" ref="list">
-            <li class="list-item" v-for="item in data.stories" key="">
+            <li class="list-item" v-for="item in data.stories" key="" @click="viewDetail(item.id)">
                 <span class="item-title fl">{{item.title}}</span>
                 <div class="image-wrapper fr" v-if="item.images !== undefined">
                     <img class="item-image" v-lazy.list="attachImageUrl(item.images[0])" alt="">
@@ -68,6 +68,9 @@ export default {
      backIndex() {
       router.push({ name: 'Home' });
     },
+      viewDetail: function(id) {
+      router.push({ name: "articleDetail", params: { id: id } });
+    },
   }
 };
 </script>
@@ -93,6 +96,10 @@ header {
   width: 100%;
   height: 220px;
   position: relative;
+  img{
+    width:100%;
+    height:100%;
+  }
   span{
       position: absolute;
       bottom: 15px;

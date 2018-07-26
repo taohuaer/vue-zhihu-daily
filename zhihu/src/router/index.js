@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Home from '../pages/Home'
 import ArticleDetail from "../pages/ArticleDetail"
 import ThemeDetail from "../pages/ThemeDetail.vue"
+import Comment from "../pages/Comment.vue"
 import Router from 'vue-router'
 
 Vue.use(Router)
@@ -13,14 +14,19 @@ export default new Router({
             component: Home
         },
         {
-            path: '/articleDetail/:id',
+            path: '/pages/articleDetail/:id',
             name: 'articleDetail',
             component: ArticleDetail
         },
         {
-            path: '/themeDetail/:id',
+            path: '/pages/themeDetail/:id',
             name: 'themeDetail',
             component: ThemeDetail
         },
+        {
+            path: '/pages/comment/:id',
+            name: 'comment',
+            component: Comment
+        }
     ]
 })

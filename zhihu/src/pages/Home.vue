@@ -47,7 +47,7 @@ export default {
     SideBar:SideBar
   },
   created() {
-    // 首页轮播图请求
+    // 首页banner数据请求
     axios.get("api/news/latest")
       .then(response => {
         this.topStories = response.data.top_stories;

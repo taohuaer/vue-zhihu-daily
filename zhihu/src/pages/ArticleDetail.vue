@@ -9,13 +9,13 @@
       <mt-button slot="right" class="header-right-icon">
         <i class="icon iconfont icon-cmstubiaozitihua06"></i>
         <i class="icon iconfont icon-shoucang"></i>
-        <i class="icon iconfont icon-pinglun"></i>
-        <i class="icon iconfont icon-dianzan11"></i>
+        <i class="icon iconfont icon-pinglun" @click="showComment">{{this.$store.state.comments}}</i>
+        <i class="icon iconfont icon-dianzan11">{{this.$store.state.popularity}}</i>
       </mt-button>
     </mt-header>
     <div class="top-wrapper">
       <img v-lazy="attachImageUrl(this.data.image)" :alt="this.data.title">
-      <span class="top-title">{{data.title}}</span>
+      <span class="top-title">{{data.title}}{{this.$store.state.id}}</span>
       <span class="img-source">{{this.data.image_source}}</span>
     </div>
     <div class="body-wrap" v-html="this.data.body">
@@ -24,6 +24,7 @@
   </div>
 </template>
 <script>
+import router from '../router';
 import axios from "axios";
 export default {
   data() {
@@ -32,13 +33,25 @@ export default {
     };
   },
   created() {
+    let id = this.$route.params.id;
     this.fetchData();
+    this.fetchStoryExtra();
   },
   methods: {
+      fetchStoryExtra: function() {
+      axios.get('api/story-extra/' + this.$store.state.id)
+      .then(response=>{
+        this.$store.state.comments=response.data.comments;
+        this.$store.state.long_comments=response.data.long_comments;
+        this.$store.state.popularity=response.data.popularity;
+        this.$store.state.short_comments=response.data.short_comments;
+      }).catch(error=>{
+      consolo.log(error);
+    })
+    },
     fetchData: function() {
       // 获得新闻id
       let id = this.$route.params.id;
-      console.log(id);
       axios
         .get("api/news/" + id)
         .then(response => {
@@ -50,6 +63,10 @@ export default {
         });
 
       this.$store.dispatch("changeCurrentNewsId", id);
+    },
+    // 查看评论页面
+    showComment: function() {
+      router.push({ name: "comment", params: { id: this.$store.state.id,long_comments: this.$store.state.long_comments} });
     },
     // 修改图片链接
     attachImageUrl: function(srcUrl) {
@@ -67,29 +84,17 @@ export default {
         'src="https://images.weserv.nl/?url='
       );
     }
-  },
-  watch: {
-    fetchData: function() {
-      let id = this.$route.params.id;
-      axios.get("api/news/" + id).then(response => {
-        response.data.body = this.attachBodyContent(response.data.body);
-        this.data = response.data;
-        console.log(this.data);
-      });
-      this.$store.dispatch("changeCurrentNewsId", id);
-      this.$store.dispatch("judgeCollectState");
-    }
   }
 };
 </script>
 <style lang="less">
 @import "../assets/css/articles_zhihu.css";
-.header-right-icon{
-  i{
+.header-right-icon {
+  i {
     font-size: 22px;
     margin-right: 10px;
   }
-  i:last-child{
+  i:last-child {
     margin: 0;
   }
 }

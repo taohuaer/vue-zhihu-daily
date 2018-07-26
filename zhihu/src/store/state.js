@@ -4,6 +4,7 @@ export default {
     stories: [], // 新闻内容数组
     ids: [], // 新闻id数组
     id: '', // 当前新闻详情的id
+    time: '首页', //首页日期切换
     nextId: '', // 下一篇新闻的id
     isFirstLoad: true, // 是否是第一次进入首页
     collectIds: [], // 收藏新闻数组id

@@ -1,6 +1,6 @@
 <template>
-  <ul ref="newsList" v-infinite-scroll="loadMore" infinite-scroll-disabled="loading" infinite-scroll-immediate-check=false infinite-scroll-distance="40">
-    <li class="clearfix" v-for="story in this.$store.state.stories" :key="story.id"  @click="viewDetail(story.id)">
+  <ul ref="newsList" v-infinite-scroll="loadMore" infinite-scroll-disabled="loading" infinite-scroll-immediate-check=true infinite-scroll-distance="40">
+    <li class="clearfix" v-for="story in this.$store.state.stories" :key="story.id" @click="viewDetail(story.id)">
       <div class="list-title fl">{{story.title}}</div>
       <div class="list-img fr"> <img :src="attachImageUrl(story.images[0])" :alt="story.title"></div>
     </li>
@@ -33,7 +33,6 @@ export default {
         .get("api/news/latest")
         .then(response => {
           let stories = response.data.stories;
-      //    console.log(response.data);
           let ids = stories.map(story => story.id);
           this.$store.dispatch("addNews", {
             stories: stories,
@@ -44,14 +43,23 @@ export default {
           console.log(error);
         });
     },
+    	// 刷新数据
+			refreshData() {
+				// 刷新数据
+				this.$store.dispatch('refreshNews');
+
+				this.$nextTick(() => {
+					this.fetchData();
+				});
+			},
     fetchMoreData: function() {
       axios
         .get("api/news/before/" + this.dateStr)
         .then(response => {
           // 合并数据
           let stories = response.data.stories;
+          console.log(response.data.date);
           let ids = stories.map(story => story.id);
-
           this.$store.dispatch("addNews", {
             stories: stories,
             ids: ids
@@ -73,6 +81,7 @@ export default {
     // 将Date类型的日期转换成String类型
     changeDate2String: function() {
       let year = this.date.getFullYear();
+      console.log(year);
       let month = this.date.getMonth() + 1;
       let day = this.date.getDate();
       month = month < 10 ? "0" + month : month;
@@ -80,29 +89,28 @@ export default {
 
       this.dateStr = year + month + day;
     },
-    attachImageUrl: function(srcUrl) {
+  
+    loadMore: function() {
+      this.loading = true;
+      Indicator.open({
+        spinnerType: "fading-circle"
+      });
+      // 加载更多数据并更新DOM
+       this.$nextTick(function() {
+        this.fetchMoreData();
+       });
+      this.loading = false;
+    },
+    viewDetail: function(id) {
+      router.push({ name: "articleDetail", params: { id: id } });
+    },
+      attachImageUrl: function(srcUrl) {
       if (srcUrl !== undefined) {
         return srcUrl.replace(
           /http\w{0,1}:\/\/p/g,
           "https://images.weserv.nl/?url=p"
         );
       }
-    },
-    loadMore: function() {
-      this.loading = true;
-
-      Indicator.open({
-        spinnerType: "fading-circle"
-      });
-      // 加载更多数据并更新DOM
-      this.$nextTick(function() {
-        this.fetchMoreData();
-      });
-      this.loading = false;
-    },
-    viewDetail: function(id) {
-      router.push({ name: "articleDetail", params: { id: id } });
-      console.log(params.id)
     }
   }
 };
